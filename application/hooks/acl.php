@@ -28,20 +28,26 @@ class Acl
         }
     }
 
-    function auth() {
+    function auth()
+    {
         $user_id = $this->CI->session->userdata('uid');
 
-        if (empty($user_id)) {
+        if (empty($user_id)
+        {
             // check cookie
             $user_id = $this->CI->input->cookie('user_id');
             $token = $this->CI->input->cookie('token');
 
-            if ($user_id && $token) {
+            if ($user_id && $token)
+            {
                 $result = $this->CI->Users_model->get_row_array(array(Users_model::ID => $user_id, Users_model::ACCESS_TOKEN => $token));
 
-                if (empty($result)) {
+                if (empty($result))
+                {
                     $this->_redirect();
-                } else {
+                }
+                else
+                {
                     $data = $this->CI->Personalinfo_model->get_row_array(array(Personalinfo_model::USER_ID => $user_id));
                     // create session
                     $this->CI->session->set_userdata(array(
@@ -56,7 +62,9 @@ class Acl
                     //$this->CI->_assign('globalLoginUserToken', $this->CI->Users_model->getMTokenByUserId($user_id));
                     //$this->CI->_assign('globalLoginUserPhoto', $this->CI->PersonalinfoModel->getPhotoByUserId($user_id));
                 }
-            } else {
+            }
+            else
+            {
                 $this->_redirect();
             }
         }/* else {
@@ -65,12 +73,15 @@ class Acl
     }*/
     }
 
-    private function _redirect() {
+    private function _redirect()
+    {
         $this->CI->config->load('acl');
         $auth = $this->CI->config->item('auth');
 
-        if (array_key_exists($this->cName, $auth)) {
-            if (in_array($this->fName, $auth[$this->cName])) {
+        if (array_key_exists($this->cName, $auth))
+        {
+            if (in_array($this->fName, $auth[$this->cName]))
+            {
                 redirect ('/account/login?redirect=' . urlencode(current_url()));
                 die();
             }
