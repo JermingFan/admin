@@ -1,12 +1,14 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Acl {
+class Acl
+{
     private $cName;
     private $fName;
     private $CI;
 
-    function __construct() {
+    function __construct()
+    {
         $this->CI =& get_instance();
         $this->cName = $this->CI->uri->segment(1);
         $this->fName = $this->CI->uri->segment(2);
@@ -16,17 +18,19 @@ class Acl {
             'Users_model',
         ));
 
-        if (!$this->cName) {
+        if (!$this->cName)
+        {
             $this->cName = 'user';
         }
-        if (!$this->fName) {
+        if (!$this->fName)
+        {
             $this->fName = 'index';
         }
     }
 
     function auth() {
-        $user_id = $this->CI->session->userdata('acc');
-//var_dump($user_id);die;
+        $user_id = $this->CI->session->userdata('uid');
+
         if (empty($user_id)) {
             // check cookie
             $user_id = $this->CI->input->cookie('user_id');
@@ -43,14 +47,22 @@ class Acl {
                     $this->CI->session->set_userdata(array(
                         'uid' => $user_id,
                         'token' => $result[Users_model::M_ACCESS_TOKEN],
+                        'username' => $data[Personalinfo_model::USER_NAME],
+                        'avatar' => $data[Personalinfo_model::FACE],
+                        //'type' => 'normal',
                     ));
 
                     $this->CI->Users_model->update_login_info($user_id);
+                    //$this->CI->_assign('globalLoginUserToken', $this->CI->Users_model->getMTokenByUserId($user_id));
+                    //$this->CI->_assign('globalLoginUserPhoto', $this->CI->PersonalinfoModel->getPhotoByUserId($user_id));
                 }
             } else {
                 $this->_redirect();
             }
-        }
+        }/* else {
+      $this->CI->_assign('globalLoginUserToken', $this->CI->Users_model->getMTokenByUserId($userId));
+      $this->CI->_assign('globalLoginUserPhoto', $this->CI->PersonalinfoModel->getPhotoByUserId($userId));
+    }*/
     }
 
     private function _redirect() {
@@ -59,7 +71,7 @@ class Acl {
 
         if (array_key_exists($this->cName, $auth)) {
             if (in_array($this->fName, $auth[$this->cName])) {
-                redirect ('/?redirect=' . urlencode(current_url()));
+                redirect ('/account/login?redirect=' . urlencode(current_url()));
                 die();
             }
         }
